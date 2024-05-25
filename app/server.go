@@ -63,7 +63,7 @@ func handleConn(conn net.Conn){
 				responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoCompressedData)))
 				responseHeaders = append(responseHeaders, "Content-Type: text/plain")
 
-				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + string(echoCompressedData))
+				response = slices.Concat([]byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n"), echoCompressedData)
 
 				foundValidEncoding = true
 			}
