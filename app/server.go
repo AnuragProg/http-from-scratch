@@ -40,7 +40,8 @@ func handleConn(conn net.Conn){
 			break
 		}
 		
-		fileData := make([]byte, 1024)
+		fileStats, _ := file.Stat()
+		fileData := make([]byte, fileStats.Size())
 		file.Read(fileData)
 
 		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %v\r\n\r\n%v", len(fileData), fileData))
