@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+
 	// Uncomment this block to pass the first stage
 	"net"
 	"os"
@@ -22,9 +23,7 @@ func handleConn(conn net.Conn){
 
 	case strings.Split(strings.Split(string(data), "\r\n")[0], " ")[0] == "POST":
 		parsedData := strings.Split(string(data), "\r\n\r\n")
-		//headers := strings.Split(parsedData[0], "\r\n")[1:]
-		body := parsedData[1]
-		fmt.Println(body)
+		body := strings.Trim(parsedData[1], "\x00")
 
 		filename := strings.TrimPrefix(route, "/files/")
 		directory := os.Args[2]
