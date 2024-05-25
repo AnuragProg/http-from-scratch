@@ -36,7 +36,7 @@ func handleConn(conn net.Conn){
 		directory := os.Args[2]
 		file, err := os.Open(directory+"/"+filename)
 		if err != nil {
-			response = []byte("HTTP/1.1 404 NOT FOUND\r\n\r\n")
+			response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
 			break
 		}
 		
