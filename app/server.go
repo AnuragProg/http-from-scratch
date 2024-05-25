@@ -42,7 +42,7 @@ func handleConn(conn net.Conn){
 		responseHeaders := []string{}
 		responseHeaders = append(responseHeaders, "HTTP/1.1 200 OK")
 		responseHeaders = append(responseHeaders, "Content-Type: text/plain")
-		responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(echoData))
+		responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoData)))
 
 		headers := strings.Split(strings.Split(string(data), "\r\n\r\n")[0], "\r\n")[1:]
 		for _, header := range headers {
