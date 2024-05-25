@@ -55,23 +55,26 @@ func handleConn(conn net.Conn){
 				var buffer bytes.Buffer
 				wr := gzip.NewWriter(&buffer)
 				wr.Write([]byte(echoData))
-				defer wr.Close()
+				wr.Close()
 
-				echoCompressedData := buffer.Bytes()
+				fmt.Println("buffer = ", buffer)
+				echoCompressedData := buffer.String()
+				fmt.Println("compressed data = ", echoCompressedData)
 
 				responseHeaders = append(responseHeaders, "Content-Encoding: gzip")
 				responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoCompressedData)))
 				responseHeaders = append(responseHeaders, "Content-Type: text/plain")
 
-				response = slices.Concat([]byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n"), echoCompressedData)
-
+				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoCompressedData)
+				fmt.Println("response = ", string(response))
 				foundValidEncoding = true
+				break
 			}
-			if !foundValidEncoding {
-				responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoData)))
-				responseHeaders = append(responseHeaders, "Content-Type: text/plain")
-				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoData)
-			}
+		}
+		if !foundValidEncoding {
+			responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoData)))
+			responseHeaders = append(responseHeaders, "Content-Type: text/plain")
+			response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoData)
 		}
 	case strings.HasPrefix(route, "/user-agent"):
 		headers := strings.Split(string(data), "\r\n")[1:]
