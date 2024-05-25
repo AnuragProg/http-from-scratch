@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	// Uncomment this block to pass the first stage
 	"net"
-	"strings"
 	"os"
+	"strings"
 )
 
 
@@ -18,6 +19,20 @@ func handleConn(conn net.Conn){
 
 	var response []byte
 	switch {
+
+	case strings.Split(strings.Split(string(data), "\r\n")[0], " ")[0] == "POST":
+		parsedData := strings.Split(string(data), "\r\n\r\n")
+		//headers := strings.Split(parsedData[0], "\r\n")[1:]
+		body := parsedData[1]
+
+		filename := strings.TrimPrefix(route, "/files/")
+		directory := os.Args[2]
+		file, _ := os.Create(directory+"/"+filename)
+		defer file.Close()
+		reader := strings.NewReader(body)
+		io.Copy(file, reader)
+		response = []byte("HTTP/1.1 201\r\n\r\n")
+
 	case route == "/":
 		response = []byte("HTTP/1.1 200 OK\r\n\r\n")
 	case strings.HasPrefix(route, "/echo"):
@@ -39,6 +54,7 @@ func handleConn(conn net.Conn){
 			response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
 			break
 		}
+		defer file.Close()
 		
 		fileStats, _ := file.Stat()
 		fileData := make([]byte, fileStats.Size())
