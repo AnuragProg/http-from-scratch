@@ -31,7 +31,7 @@ func handleConn(conn net.Conn){
 		defer file.Close()
 		reader := strings.NewReader(body)
 		io.Copy(file, reader)
-		response = []byte("HTTP/1.1 201\r\n\r\n")
+		response = []byte("HTTP/1.1 201 Created\r\n\r\n")
 
 	case route == "/":
 		response = []byte("HTTP/1.1 200 OK\r\n\r\n")
