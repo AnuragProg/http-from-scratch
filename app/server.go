@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"slices"
 
 	// Uncomment this block to pass the first stage
 	"net"
@@ -46,9 +47,9 @@ func handleConn(conn net.Conn){
 
 		headers := strings.Split(strings.Split(string(data), "\r\n\r\n")[0], "\r\n")[1:]
 		for _, header := range headers {
-			key, val := strings.Split(header, ": ")[0], strings.Split(header, ": ")[1]
-			if key == "Accept-Encoding" && val != "invalid-encoding"{
-				responseHeaders = append(responseHeaders, "Content-Encoding: " + val)
+			key, val := strings.Split(header, ": ")[0], strings.Split(strings.Split(header, ": ")[1], ", ")
+			if key == "Accept-Encoding" && slices.Contains(val, "gzip"){
+				responseHeaders = append(responseHeaders, "Content-Encoding: gzip")
 			}
 		}
 		response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoData)
