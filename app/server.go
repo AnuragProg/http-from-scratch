@@ -34,13 +34,21 @@ func main() {
 
 	var response []byte
 	switch {
-		case route == "/":
-			response = []byte("HTTP/1.1 200 OK\r\n\r\n")
-		case strings.HasPrefix(route, "/echo"):
-			echoData := strings.TrimPrefix(route, "/echo/")
-			response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(echoData), echoData))
-		default:
-			response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
+	case route == "/":
+		response = []byte("HTTP/1.1 200 OK\r\n\r\n")
+	case strings.HasPrefix(route, "/echo"):
+		echoData := strings.TrimPrefix(route, "/echo/")
+		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(echoData), echoData))
+	case strings.HasPrefix(route, "/user-agent"):
+		headers := strings.Split(string(data), "\r\n")[1:]
+		for _, header := range headers {
+			keyAndValue := strings.Split(header, ": ")
+			if keyAndValue[0] == "User-Agent" {
+				response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(keyAndValue[1]), keyAndValue[1]))
+			}
+		}
+	default:
+		response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
 	}
 	conn.Write(response)
 }
