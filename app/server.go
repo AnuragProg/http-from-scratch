@@ -57,13 +57,13 @@ func handleConn(conn net.Conn){
 				wr.Write([]byte(echoData))
 				wr.Close()
 
-				echoCompressedData := buffer.String()
+				echoCompressedData := buffer.Bytes()
 
 				responseHeaders = append(responseHeaders, "Content-Encoding: gzip")
 				responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoCompressedData)))
 				responseHeaders = append(responseHeaders, "Content-Type: text/plain")
 
-				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoCompressedData)
+				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + string(echoCompressedData))
 
 				foundValidEncoding = true
 			}
