@@ -55,7 +55,7 @@ func handleConn(conn net.Conn){
 				var buffer bytes.Buffer
 				wr := gzip.NewWriter(&buffer)
 				wr.Write([]byte(echoData))
-				wr.Close()
+				defer wr.Close()
 
 				echoCompressedData := buffer.Bytes()
 
