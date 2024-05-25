@@ -38,13 +38,20 @@ func handleConn(conn net.Conn){
 
 	case strings.HasPrefix(route, "/echo"):
 		echoData := strings.TrimPrefix(route, "/echo/")
+
+		responseHeaders := []string{}
+		responseHeaders = append(responseHeaders, "HTTP/1.1 200 OK")
+		responseHeaders = append(responseHeaders, "Content-Type: text/plain")
+		responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(echoData))
+
 		headers := strings.Split(strings.Split(string(data), "\r\n\r\n")[0], "\r\n")[1:]
 		for _, header := range headers {
 			key, val := strings.Split(header, ": ")[0], strings.Split(header, ": ")[1]
-			if key == "Accept-Encoding" {
-				response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Encoding: %v\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", val, len(echoData), echoData))
+			if key == "Accept-Encoding" && val != "invalid-encoding"{
+				responseHeaders = append(responseHeaders, "Content-Encoding: " + val)
 			}
 		}
+		response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoData)
 	case strings.HasPrefix(route, "/user-agent"):
 		headers := strings.Split(string(data), "\r\n")[1:]
 		for _, header := range headers {
