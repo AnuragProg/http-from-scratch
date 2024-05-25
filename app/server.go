@@ -33,10 +33,10 @@ func handleRespondWithBody(conn net.Conn){
 
 	route := strings.Split(strings.Split(string(data), "\r\n")[0], " ")[1]
 
-	if !strings.HasPrefix(route, "/echo") {
-
+	if !strings.HasPrefix(route, "/echo/") {
+		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+		return
 	}
-
 
 	echoData := strings.TrimPrefix(route, "/echo/")
 
