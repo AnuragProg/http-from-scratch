@@ -46,29 +46,31 @@ func handleConn(conn net.Conn){
 		responseHeaders = append(responseHeaders, "HTTP/1.1 200 OK")
 
 		headers := strings.Split(strings.Split(string(data), "\r\n\r\n")[0], "\r\n")[1:]
+
+		foundValidEncoding := false
+
 		for _, header := range headers {
 			key, val := strings.Split(header, ": ")[0], strings.Split(strings.Split(header, ": ")[1], ", ")
-			if key == "Accept-Encoding" {
-				if slices.Contains(val, "gzip"){
-					var buffer bytes.Buffer
-					wr := gzip.NewWriter(&buffer)
-					wr.Write([]byte(echoData))
-					wr.Close()
+			if key == "Accept-Encoding" && slices.Contains(val, "gzip"){
+				var buffer bytes.Buffer
+				wr := gzip.NewWriter(&buffer)
+				wr.Write([]byte(echoData))
+				wr.Close()
 
-					echoCompressedData := buffer.String()
+				echoCompressedData := buffer.String()
 
-					responseHeaders = append(responseHeaders, "Content-Encoding: gzip")
-					responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoCompressedData)))
-					responseHeaders = append(responseHeaders, "Content-Type: text/plain")
+				responseHeaders = append(responseHeaders, "Content-Encoding: gzip")
+				responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoCompressedData)))
+				responseHeaders = append(responseHeaders, "Content-Type: text/plain")
 
-					response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoCompressedData)
+				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoCompressedData)
 
-				}else {
-					responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoData)))
-					responseHeaders = append(responseHeaders, "Content-Type: text/plain")
-					response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoData)
-				}
-				break
+				foundValidEncoding = true
+			}
+			if !foundValidEncoding {
+				responseHeaders = append(responseHeaders, "Content-Length: " + fmt.Sprint(len(echoData)))
+				responseHeaders = append(responseHeaders, "Content-Type: text/plain")
+				response = []byte(strings.Join(responseHeaders, "\r\n") + "\r\n\r\n" + echoData)
 			}
 		}
 	case strings.HasPrefix(route, "/user-agent"):
