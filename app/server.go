@@ -8,6 +8,36 @@ import (
 	"os"
 )
 
+func handleExtractUrl(conn net.Conn){
+	data := make([]byte, 1024)
+	conn.Read(data)
+
+	headers :=strings.Split(string(data), "\r\n") 
+	requestInfo := strings.Split(headers[0], " ")
+	fmt.Println(requestInfo)
+	fmt.Println(string(data))
+
+	var response []byte
+	switch requestInfo[1]{
+		case "/":
+			response = []byte("HTTP/1.1 200 OK\r\n\r\n")
+		default:
+			response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
+	}
+	conn.Write(response)
+}
+
+func handleRespondWithBody(conn net.Conn){
+	data := make([]byte, 1024)
+	conn.Read(data)
+
+	route := strings.Split(strings.Split(string(data), "\r\n")[0], " ")[1]
+	echoData := strings.TrimPrefix(route, "/echo/")
+
+	response := []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(echoData), echoData))
+	conn.Write(response)
+}
+
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
@@ -25,22 +55,5 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-
-	
-	data := make([]byte, 1024)
-	conn.Read(data)
-
-	headers :=strings.Split(string(data), "\r\n") 
-	requestInfo := strings.Split(headers[0], " ")
-	fmt.Println(requestInfo)
-	fmt.Println(string(data))
-
-	var response []byte
-	switch requestInfo[1]{
-		case "/":
-			response = []byte("HTTP/1.1 200 OK\r\n\r\n")
-		default:
-			response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
-	}
-	conn.Write(response)
+	handleRespondWithBody(conn)
 }
