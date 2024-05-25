@@ -31,6 +31,19 @@ func handleConn(conn net.Conn){
 				response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(keyAndValue[1]), keyAndValue[1]))
 			}
 		}
+	case strings.HasPrefix(route, "/files"):
+		filename := strings.TrimPrefix(route, "/files/")
+		directory := os.Args[2]
+		file, err := os.Open(directory+"/"+filename)
+		if err != nil {
+			response = []byte("HTTP/1.1 404\r\n\r\n")
+			break
+		}
+		
+		fileData := make([]byte, 1024)
+		file.Read(fileData)
+
+		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %v\r\n\r\n%v", len(fileData), fileData))
 	default:
 		response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
 	}
