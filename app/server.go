@@ -4,6 +4,7 @@ import (
 	"fmt"
 	// Uncomment this block to pass the first stage
 	"net"
+	"strings"
 	"os"
 )
 
@@ -25,6 +26,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	response := []byte("HTTP/1.1 200 OK\r\n\r\n")
+	
+	data := make([]byte, 1024)
+	conn.Read(data)
+
+	headers :=strings.Split(string(data), "\r\n") 
+	requestInfo := strings.Split(headers[0], " ")
+	fmt.Println(requestInfo)
+	fmt.Println(string(data))
+
+	var response []byte
+	switch requestInfo[1]{
+		case "/":
+			response = []byte("HTTP/1.1 200 OK\r\n\r\n")
+		default:
+			response = []byte("HTTP/1.1 404 NOT FOUND\r\n\r\n")
+	}
 	conn.Write(response)
 }
