@@ -40,7 +40,7 @@ func main() {
 		case "/":
 			response = []byte("HTTP/1.1 200 OK\r\n\r\n")
 		default:
-			response = []byte("HTTP/1.1 404 NOT FOUND\r\n\r\n")
+			response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
 	}
 	conn.Write(response)
 }
