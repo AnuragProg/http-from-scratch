@@ -44,7 +44,7 @@ func handleConn(conn net.Conn){
 		fileData := make([]byte, fileStats.Size())
 		file.Read(fileData)
 
-		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %v\r\n\r\n%v", len(fileData), fileData))
+		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %v\r\n\r\n%v", len(fileData), string(fileData)))
 	default:
 		response = []byte("HTTP/1.1 404 Not Found\r\n\r\n")
 	}
