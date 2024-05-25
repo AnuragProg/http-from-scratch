@@ -35,9 +35,10 @@ func handleConn(conn net.Conn){
 
 	case route == "/":
 		response = []byte("HTTP/1.1 200 OK\r\n\r\n")
+
 	case strings.HasPrefix(route, "/echo"):
 		echoData := strings.TrimPrefix(route, "/echo/")
-		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(echoData), echoData))
+		response = []byte(fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %v\r\n\r\n%v", len(echoData), echoData))
 	case strings.HasPrefix(route, "/user-agent"):
 		headers := strings.Split(string(data), "\r\n")[1:]
 		for _, header := range headers {
